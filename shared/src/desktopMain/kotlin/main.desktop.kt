@@ -16,3 +16,16 @@ fun AppPreview() {
 fun skillPreview() {
     Skills(arrayOf(Competence("test",2),Competence("test",2),Competence("test",2),Competence("test",2),Competence("test",2),Competence("test",2),Competence("test",2)))
 }
+
+// Quizz Preview
+@Preview
+@Composable
+fun AppQuizz() {
+    Quiz.WelcomeScreen()
+}
+
+@Preview
+@Composable
+fun ScoreQuizz() {
+    Quiz.ScoreScreen("10/20")
+}
