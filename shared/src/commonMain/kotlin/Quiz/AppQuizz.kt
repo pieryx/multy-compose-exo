@@ -22,5 +22,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun AppQuizz() {
 
-
+QuestionScreen(listOf<Question> (
+    Question(1,"Andoid is a great platform1 ?",1, listOf<Answer>( Answer(1,"Yes"), Answer(2,"No"))),
+    Question(2,"Andoid is a great platform 2?",1, listOf<Answer>( Answer(1,"Yes"), Answer(2,"No"))),
+    Question(3,"Andoid is a great platform3 ?",1, listOf<Answer>( Answer(1,"Yes"), Answer(2,"No")))
+))
 }

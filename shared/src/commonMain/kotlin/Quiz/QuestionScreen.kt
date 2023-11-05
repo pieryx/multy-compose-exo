@@ -13,39 +13,67 @@ import androidx.compose.material.Card
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.asFloatState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun QuestionScreen(q:Question) {
-
-    val selectedValue = remember { mutableStateOf("") }
-    var reply:Int=0;
-    val label = "Item"
-    var progress =0.01f
-
+fun QuestionScreen(q:List<Question>) {
+    var selectedValue  by remember { mutableStateOf(0) }
+    var currentIndex by remember { mutableStateOf(0) }
+    var score by remember { mutableStateOf(0) }
+    var finish by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     fun nextQuestion() {
-        TODO("Not yet implemented")
+        if(selectedValue==q[currentIndex].correctId && !finish) {
+            score++
+        }
+        selectedValue=0
+        if(currentIndex+1<q.size){
+            currentIndex++
+
+        }else{
+            finish=true
+            scope.launch {
+                snackbarHostState.showSnackbar("c'est fini ton score est de: "+score.toString())
+            }
+        }
     }
 
-    Scaffold (bottomBar = {
-        Column {
-            Button(onClick = { nextQuestion() }, modifier = Modifier) {
-                Text("Next")
+    Scaffold ( snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState)
+    },bottomBar = {
+        Column (modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            if(!finish){
+                Button(onClick = { nextQuestion() }, modifier = Modifier) {
+                    Text("Next")
+                }
+            }else{
+                Button(onClick = { nextQuestion() }, modifier = Modifier) {
+                    Text("Résultat")
+                }
             }
+
             LinearProgressIndicator(
                 modifier = Modifier.fillMaxWidth()
                     .height(15.dp),
-                progress = progress
+                progress = (currentIndex+1).toFloat()/q.size.toFloat()
             )
         }
 
@@ -57,33 +85,31 @@ fun QuestionScreen(q:Question) {
         ) {
 
 
-            Card {
-                Column (modifier = Modifier.padding(10.dp)){
-                    Text(q.label)
+                Card {
+                    Column (modifier = Modifier.padding(10.dp)){
+                        Text(q[currentIndex].label)
+                    }
                 }
+                Column(modifier = Modifier.fillMaxWidth(),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally)
+                {
+
+                    q[currentIndex].answers.forEach { answer ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            RadioButton(
+                                selected = selectedValue == answer.id,
+                                onClick = { selectedValue = answer.id}
+                            )
+                            Text(
+                                text = answer.label
+                            )
+                        }
+
+                    }
+                }
+
             }
-                Column(modifier = Modifier.fillMaxWidth(),verticalArrangement = Arrangement.Center,
-                    ){
-
-                        q.answers.forEach { answer ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                RadioButton(
-                                    selected = selectedValue.value == label,
-                                    onClick = { selectedValue.value = label; reply = answer.id }
-                                )
-                                Text(
-                                    text = answer.label,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-
-            }
-
-            }
-
-        }
         }
 }
